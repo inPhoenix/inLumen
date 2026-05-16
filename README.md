@@ -9,3 +9,4 @@
 https://inphoenix.github.io/inLumen/
 
 
+<img title="logo" src="public/lumen.png" width="80%" alt='demo'>
