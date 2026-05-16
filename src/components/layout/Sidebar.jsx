@@ -9,6 +9,11 @@ export function Sidebar({
   masteredCount,
   levels,
   patterns,
+  activePatterns,
+  togglePattern,
+  clearPatterns,
+  collapsed,
+  onToggleCollapse,
 }) {
   const progress = Math.min(
     100,
@@ -16,15 +21,38 @@ export function Sidebar({
   );
   const remaining = user.nextThreshold - user.refined;
   const previewPatterns = patterns.slice(0, 6);
+  const activePatternCount = activePatterns.length;
+
+  function expandFromEmptySpace(event) {
+    if (!collapsed || event.target.closest("button")) return;
+    onToggleCollapse();
+  }
 
   return (
-    <aside className="sidebar" aria-label="Learning sidebar">
-      <div className="brand" aria-label="Lumen Refinery">
-        <span className="brand-mark" aria-hidden="true" />
-        <span className="brand-name">
-          lumen<span>.</span>
-        </span>
-        <span className="brand-tag">refinery</span>
+    <aside
+      className={`sidebar ${collapsed ? "is-collapsed" : ""}`}
+      aria-label="Learning sidebar"
+      onClick={expandFromEmptySpace}
+    >
+      <div className="sidebar-head">
+        <div className="brand" aria-label="Lumen Refinery">
+          <span className="brand-mark" aria-hidden="true" />
+          <span className="brand-name">
+            lumen<span>.</span>
+          </span>
+          <span className="brand-tag">refinery</span>
+        </div>
+        <button
+          className="sidebar-toggle"
+          onClick={onToggleCollapse}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <span className="sidebar-toggle-icon" aria-hidden="true">
+            ‹
+          </span>
+        </button>
       </div>
 
       <section className="level-card" aria-label="Level progress">
@@ -65,30 +93,42 @@ export function Sidebar({
         <button
           className={view === "today" ? "active" : ""}
           onClick={() => setView("today")}
+          title="Today's catch"
         >
+          <span className="nav-code">T</span>
           <span className="dot" />
-          Today's catch<span className="count">{counts.today}</span>
+          <span className="nav-text">Today's catch</span>
+          <span className="count">{counts.today}</span>
         </button>
         <button
           className={view === "all" ? "active" : ""}
           onClick={() => setView("all")}
+          title="All phrases"
         >
+          <span className="nav-code">A</span>
           <span className="dot" />
-          All phrases<span className="count">{counts.all}</span>
+          <span className="nav-text">All phrases</span>
+          <span className="count">{counts.all}</span>
         </button>
         <button
           className={view === "review" ? "active" : ""}
           onClick={() => setView("review")}
+          title="Due to review"
         >
+          <span className="nav-code">R</span>
           <span className="dot" />
-          Due to review<span className="count">{counts.due}</span>
+          <span className="nav-text">Due to review</span>
+          <span className="count">{counts.due}</span>
         </button>
         <button
           className={view === "mastered" ? "active" : ""}
           onClick={() => setView("mastered")}
+          title="Mastered"
         >
+          <span className="nav-code">M</span>
           <span className="dot" />
-          Mastered<span className="count">{masteredCount}</span>
+          <span className="nav-text">Mastered</span>
+          <span className="count">{masteredCount}</span>
         </button>
       </nav>
 
@@ -97,19 +137,60 @@ export function Sidebar({
         <button
           className={levelFilter === "all" ? "active" : ""}
           onClick={() => setLevelFilter("all")}
+          title="All levels"
         >
-          All levels
+          <span className="level-short">All</span>
+          <span className="level-text">All levels</span>
         </button>
         {levels.map((level) => (
           <button
             key={level.id}
             className={levelFilter === level.id ? "active" : ""}
             onClick={() => setLevelFilter(level.id)}
+            title={`${level.label}: ${level.name}`}
           >
-            <span>{level.label}</span>
+            <span className="level-short">
+              {level.label.replace("Level ", "L")}
+            </span>
+            <span className="level-text">{level.label}</span>
             <small>{level.name}</small>
           </button>
         ))}
+      </section>
+
+      <section className="pattern-panel" aria-label="Pattern filters">
+        <div className="filter-head">
+          <div className="nav-label">Patterns</div>
+          {activePatternCount > 0 && (
+            <button
+              className="clear-patterns"
+              onClick={clearPatterns}
+              title="Clear pattern filters"
+            >
+              clear {activePatternCount}
+            </button>
+          )}
+        </div>
+        <div className="pattern-list">
+          {patterns.map((pattern) => (
+            <button
+              key={pattern.id}
+              className={
+                activePatterns.includes(pattern.id)
+                  ? "pattern-filter active"
+                  : "pattern-filter"
+              }
+              onClick={() => togglePattern(pattern.id)}
+              style={{ "--h": pattern.hue }}
+              aria-pressed={activePatterns.includes(pattern.id)}
+              title={pattern.label}
+            >
+              <span className="chip-dot" />
+              <span className="pattern-name">{pattern.label}</span>
+              <span className="ct">{pattern.count}</span>
+            </button>
+          ))}
+        </div>
       </section>
 
       <button className="drift-mini" onClick={openDrift}>

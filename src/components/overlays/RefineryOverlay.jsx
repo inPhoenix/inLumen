@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
-import { DATA } from "../../data";
 import { patternById } from "../../utils/learning";
 
-export function RefineryOverlay({ onClose, initialPhraseId, onRestore }) {
+export function RefineryOverlay({
+  onClose,
+  initialPhraseId,
+  onRestore,
+  drills,
+  scopeLabel,
+}) {
   const firstIndex = Math.max(
     0,
-    DATA.drills.findIndex((drill) => drill.phraseId === initialPhraseId),
+    drills.findIndex((drill) => drill.phraseId === initialPhraseId),
   );
   const [step, setStep] = useState(firstIndex);
   const [picked, setPicked] = useState(null);
   const [restored, setRestored] = useState(new Set());
-  const drill = DATA.drills[step];
-  const correct = picked !== null && picked === drill.answer;
+  const drill = drills[step];
+  const correct = drill && picked !== null && picked === drill.answer;
 
   useEffect(() => {
     const onKey = (event) => {
@@ -24,7 +29,7 @@ export function RefineryOverlay({ onClose, initialPhraseId, onRestore }) {
   }, [picked, step]);
 
   function choose(index) {
-    if (picked !== null) return;
+    if (!drill || picked !== null) return;
     setPicked(index);
     if (index === drill.answer && drill.phraseId && !restored.has(drill.id)) {
       setRestored((current) => new Set([...current, drill.id]));
@@ -35,12 +40,46 @@ export function RefineryOverlay({ onClose, initialPhraseId, onRestore }) {
   function next() {
     setPicked(null);
     setStep((current) => {
-      if (current + 1 >= DATA.drills.length) {
+      if (current + 1 >= drills.length) {
         onClose();
         return current;
       }
       return current + 1;
     });
+  }
+
+  if (!drill) {
+    return (
+      <div className="overlay" onClick={onClose}>
+        <section
+          className="overlay-panel refinery-panel"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="overlay-head">
+            <div>
+              <h2>The Refinery</h2>
+              <p>
+                No drills are available for this focus yet.
+                <span className="refinery-scope">Focus · {scopeLabel}</span>
+              </p>
+            </div>
+            <button
+              className="overlay-close"
+              onClick={onClose}
+              aria-label="Close refinery"
+            >
+              ×
+            </button>
+          </div>
+          <div className="overlay-body refinery">
+            <div className="empty-state">
+              Choose another level or switch back to all levels to practice the
+              full deck.
+            </div>
+          </div>
+        </section>
+      </div>
+    );
   }
 
   return (
@@ -54,6 +93,7 @@ export function RefineryOverlay({ onClose, initialPhraseId, onRestore }) {
             <h2>The Refinery</h2>
             <p>
               Practice resurfaces your own slips: predict first, then reveal.
+              <span className="refinery-scope"> Focus · {scopeLabel}</span>
             </p>
           </div>
           <button
@@ -67,10 +107,10 @@ export function RefineryOverlay({ onClose, initialPhraseId, onRestore }) {
         <div className="overlay-body refinery">
           <div className="refinery-meta">
             <span>
-              Drill {step + 1} of {DATA.drills.length}
+              Drill {step + 1} of {drills.length}
             </span>
             <div className="refinery-dots">
-              {DATA.drills.map((item, index) => (
+              {drills.map((item, index) => (
                 <span
                   key={item.id}
                   className={`d ${index < step ? "done" : ""} ${index === step ? "active" : ""}`}
@@ -129,10 +169,7 @@ export function RefineryOverlay({ onClose, initialPhraseId, onRestore }) {
             <div className="spacer" />
             {picked !== null && (
               <button className="btn primary" onClick={next}>
-                {step + 1 >= DATA.drills.length
-                  ? "Finish session"
-                  : "Next drill"}{" "}
-                →
+                {step + 1 >= drills.length ? "Finish session" : "Next drill"} →
               </button>
             )}
           </div>

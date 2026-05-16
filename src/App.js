@@ -49,6 +49,7 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [nameEditorOpen, setNameEditorOpen] = useState(false);
   const [refinerySeed, setRefinerySeed] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => safeSaveJSON(STORAGE_KEYS.memory, memoryMap), [memoryMap]);
   useEffect(
@@ -143,6 +144,23 @@ function App() {
     return list;
   }, [view, levelFilter, activePatterns, memoryMap, mastered]);
 
+  const phraseById = useMemo(() => {
+    return Object.fromEntries(
+      DATA.phrases.map((phrase) => [phrase.id, phrase]),
+    );
+  }, []);
+
+  const selectedLevel = useMemo(() => {
+    return DATA.levels.find((level) => level.id === levelFilter) || null;
+  }, [levelFilter]);
+
+  const scopedRefineryDrills = useMemo(() => {
+    if (levelFilter === "all") return DATA.drills;
+    return DATA.drills.filter(
+      (drill) => phraseById[drill.phraseId]?.level === levelFilter,
+    );
+  }, [levelFilter, phraseById]);
+
   const whisper = useMemo(() => {
     const recurring = DATA.phrases
       .filter((phrase) => phrase.hot)
@@ -156,6 +174,10 @@ function App() {
         ? current.filter((id) => id !== patternId)
         : [...current, patternId],
     );
+  }
+
+  function clearPatterns() {
+    setActivePatterns([]);
   }
 
   function restoreMemory(phraseId, amount = 22) {
@@ -216,9 +238,10 @@ function App() {
   }
 
   const userWithName = { ...DATA.user, name: displayName };
+  const refineryScopeLabel = selectedLevel ? selectedLevel.label : "all levels";
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       <Sidebar
         user={userWithName}
         view={view}
@@ -230,6 +253,11 @@ function App() {
         masteredCount={counts.mastered}
         levels={DATA.levels}
         patterns={DATA.patterns}
+        activePatterns={activePatterns}
+        togglePattern={togglePattern}
+        clearPatterns={clearPatterns}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
       />
       <div className="main">
         <TopBar
@@ -238,24 +266,18 @@ function App() {
           openSearch={() => setSearchOpen(true)}
           openNameEditor={() => setNameEditorOpen(true)}
           whisper={whisper}
+          refineryScopeLabel={refineryScopeLabel}
         />
         <Feed
           phrases={visiblePhrases}
           expanded={expanded}
           setExpanded={setExpanded}
-          activePatterns={activePatterns}
-          togglePattern={togglePattern}
           memoryMap={memoryMap}
           mastered={mastered}
           boostedId={boostedId}
           onRemember={restoreMemory}
           onPractice={openRefinery}
           onMaster={toggleMastery}
-          levelFilter={levelFilter}
-          setLevelFilter={setLevelFilter}
-          levels={DATA.levels}
-          patterns={DATA.patterns}
-          totalPhraseCount={DATA.phrases.length}
         />
       </div>
 
@@ -275,8 +297,10 @@ function App() {
       )}
       {refinerySeed !== null && (
         <RefineryOverlay
-          key={refinerySeed}
+          key={`${refinerySeed}-${levelFilter}`}
           initialPhraseId={refinerySeed === "general" ? null : refinerySeed}
+          drills={scopedRefineryDrills}
+          scopeLabel={refineryScopeLabel}
           onRestore={restoreMemory}
           onClose={() => setRefinerySeed(null)}
         />

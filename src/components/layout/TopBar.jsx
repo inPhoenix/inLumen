@@ -14,6 +14,7 @@ export function TopBar({
   openSearch,
   openNameEditor,
   whisper,
+  refineryScopeLabel,
 }) {
   return (
     <header className="topbar">
@@ -34,7 +35,9 @@ export function TopBar({
           <span className="btn-kbd">⌘K</span>
         </button>
         <button className="btn primary" onClick={() => openRefinery(null)}>
-          Enter the Refinery <span className="btn-kbd">↵</span>
+          Enter the Refinery{" "}
+          <span className="btn-kbd">{refineryScopeLabel}</span>
+          <span className="btn-kbd">↵</span>
         </button>
       </div>
     </header>

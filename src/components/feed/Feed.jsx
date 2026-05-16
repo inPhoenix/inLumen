@@ -1,6 +1,4 @@
 import { useMemo } from "react";
-import { LevelStrip } from "./LevelStrip";
-import { PatternFilters } from "./PatternFilters";
 import { PhraseCard } from "./PhraseCard";
 import { StoryCallout } from "./StoryCallout";
 
@@ -8,19 +6,12 @@ export function Feed({
   phrases,
   expanded,
   setExpanded,
-  activePatterns,
-  togglePattern,
   memoryMap,
   mastered,
   boostedId,
   onRemember,
   onPractice,
   onMaster,
-  levelFilter,
-  setLevelFilter,
-  levels,
-  patterns,
-  totalPhraseCount,
 }) {
   const grouped = useMemo(() => {
     return phrases.reduce((acc, phrase) => {
@@ -33,18 +24,7 @@ export function Feed({
 
   return (
     <main className="feed-area">
-      <LevelStrip
-        levelFilter={levelFilter}
-        setLevelFilter={setLevelFilter}
-        levels={levels}
-        totalPhraseCount={totalPhraseCount}
-      />
       <StoryCallout />
-      <PatternFilters
-        activePatterns={activePatterns}
-        togglePattern={togglePattern}
-        patterns={patterns}
-      />
 
       {Object.entries(grouped).map(([day, list]) => (
         <section key={day} className="day-group">
