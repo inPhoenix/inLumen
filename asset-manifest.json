@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/inLumen/static/css/main.63da412b.css",
+    "main.js": "/inLumen/static/js/main.d0ea7fab.js",
+    "index.html": "/inLumen/index.html",
+    "main.63da412b.css.map": "/inLumen/static/css/main.63da412b.css.map",
+    "main.d0ea7fab.js.map": "/inLumen/static/js/main.d0ea7fab.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.63da412b.css",
+    "static/js/main.d0ea7fab.js"
+  ]
+}
