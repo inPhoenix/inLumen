@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/inLumen/static/css/main.b3bfe7ea.css",
-    "main.js": "/inLumen/static/js/main.8a059df3.js",
+    "main.css": "/inLumen/static/css/main.83f8ea45.css",
+    "main.js": "/inLumen/static/js/main.3268ca01.js",
     "index.html": "/inLumen/index.html",
-    "main.b3bfe7ea.css.map": "/inLumen/static/css/main.b3bfe7ea.css.map",
-    "main.8a059df3.js.map": "/inLumen/static/js/main.8a059df3.js.map"
+    "main.83f8ea45.css.map": "/inLumen/static/css/main.83f8ea45.css.map",
+    "main.3268ca01.js.map": "/inLumen/static/js/main.3268ca01.js.map"
   },
   "entrypoints": [
-    "static/css/main.b3bfe7ea.css",
-    "static/js/main.8a059df3.js"
+    "static/css/main.83f8ea45.css",
+    "static/js/main.3268ca01.js"
   ]
 }
