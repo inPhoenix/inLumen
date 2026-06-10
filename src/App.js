@@ -3,6 +3,7 @@ import "./App.scss";
 import {
   DriftOverlay,
   Feed,
+  MobileNav,
   NameOverlay,
   RefineryOverlay,
   SearchOverlay,
@@ -17,6 +18,7 @@ import {
   safeSaveJSON,
   safeSaveString,
 } from "./utils/storage";
+import { useIsMobile } from "./utils/useIsMobile";
 
 function App() {
   const initialMemory = useMemo(() => {
@@ -50,6 +52,11 @@ function App() {
   const [nameEditorOpen, setNameEditorOpen] = useState(false);
   const [refinerySeed, setRefinerySeed] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (isMobile) setActivePatterns([]);
+  }, [isMobile]);
 
   useEffect(() => safeSaveJSON(STORAGE_KEYS.memory, memoryMap), [memoryMap]);
   useEffect(
@@ -242,23 +249,35 @@ function App() {
 
   return (
     <div className={`app-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
-      <Sidebar
-        user={userWithName}
-        view={view}
-        setView={setView}
-        counts={counts}
-        openDrift={() => setDriftOpen(true)}
-        levelFilter={levelFilter}
-        setLevelFilter={setLevelFilter}
-        masteredCount={counts.mastered}
-        levels={DATA.levels}
-        patterns={DATA.patterns}
-        activePatterns={activePatterns}
-        togglePattern={togglePattern}
-        clearPatterns={clearPatterns}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
-      />
+      {isMobile ? (
+        <MobileNav
+          user={userWithName}
+          view={view}
+          setView={setView}
+          counts={counts}
+          levelFilter={levelFilter}
+          setLevelFilter={setLevelFilter}
+          levels={DATA.levels}
+        />
+      ) : (
+        <Sidebar
+          user={userWithName}
+          view={view}
+          setView={setView}
+          counts={counts}
+          openDrift={() => setDriftOpen(true)}
+          levelFilter={levelFilter}
+          setLevelFilter={setLevelFilter}
+          masteredCount={counts.mastered}
+          levels={DATA.levels}
+          patterns={DATA.patterns}
+          activePatterns={activePatterns}
+          togglePattern={togglePattern}
+          clearPatterns={clearPatterns}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
+        />
+      )}
       <div className="main">
         <TopBar
           user={userWithName}
